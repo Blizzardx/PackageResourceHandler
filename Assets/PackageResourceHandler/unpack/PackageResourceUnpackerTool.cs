@@ -83,16 +83,17 @@ public class PackageResourceUnpackerTool : MonoBehaviour
     }
     private IEnumerator BeginLoad(PackageResourceLoaderElement taskElem)
     {
-        WWW loader = new WWW(taskElem.GetUrl());
-
-        yield return loader;
+        Debug.Log(taskElem.GetUrl());
+        PackageResourceWWWElement loader = new PackageResourceWWWElement(taskElem.GetUrl());
+        
+        yield return loader.GetRequest();
 
         // update loader count
         --m_iCurrentLoaderCount;
 
         if (m_bIsCrash)
         {
-            loader.Dispose();
+            loader.GetRequest().Dispose();
 
             if(m_iCurrentLoaderCount == 0)
             {
@@ -101,65 +102,71 @@ public class PackageResourceUnpackerTool : MonoBehaviour
         }
         else
         {
-            OnOneTaskDone(taskElem, loader);
+            OnOneTaskDone(taskElem, loader.GetRequest());
         }
     }
     private void OnOneTaskDone(PackageResourceLoaderElement taskElem,WWW request)
-    {        
-        if (request.error != null)
+    {
+        do
         {
-            taskElem.SetErrorInfo(request.error);
-            // release www
-            request.Dispose();
-
-            // add to error list
-            m_TaskErrorQueue.Enqueue(taskElem);
-            return;
-        }
-        // check www content
-        if(null == request.bytes)
-        {
-            taskElem.SetErrorInfo("load error");
-
-            // release www
-            request.Dispose();
-
-            // add to error list
-            m_TaskErrorQueue.Enqueue(taskElem);
-            return;
-        }
-        try
-        {
-            byte[] content = request.bytes;
-            if(null != m_Decompressor)
+            if (request.error != null)
             {
-                // decompress
-                content = m_Decompressor.Decompress(content);
+                taskElem.SetErrorInfo(request.error);
+                // release www
+                request.Dispose();
+
+                // add to error list
+                m_TaskErrorQueue.Enqueue(taskElem);
+                break;
             }
-            // ensure folder
-            PackageResourceTool.EnsureFolder(taskElem.GetOutputPath());
+            // check www content
+            if (null == request.bytes)
+            {
+                taskElem.SetErrorInfo("load error");
 
-            // try write byte files
-            System.IO.File.WriteAllBytes(taskElem.GetOutputPath(), content);
+                // release www
+                request.Dispose();
 
-            // add to succeed list
-            m_TaskSucceedQueue.Enqueue(taskElem);
+                // add to error list
+                m_TaskErrorQueue.Enqueue(taskElem);
+                break;
+            }
+            try
+            {
+                byte[] content = request.bytes;
+                if (null != m_Decompressor)
+                {
+                    // decompress
+                    content = m_Decompressor.Decompress(content);
+                }
+                // ensure folder
+                PackageResourceTool.EnsureFolder(taskElem.GetOutputPath());
+
+                // try write byte files
+                System.IO.File.WriteAllBytes(taskElem.GetOutputPath(), content);
+
+                // add to succeed list
+                m_TaskSucceedQueue.Enqueue(taskElem);
+            }
+            catch (Exception e)
+            {
+                // mark error msg
+                taskElem.SetErrorInfo(e.Message);
+
+                // release www
+                request.Dispose();
+
+                // add to error list
+                m_TaskErrorQueue.Enqueue(taskElem);
+
+                // check is need crash
+                m_bIsCrash = true;
+                CallbackWithError();
+                return;
+            }
         }
-        catch (Exception e)
-        {
-            // mark error msg
-            taskElem.SetErrorInfo(e.Message);
-
-            // release www
-            request.Dispose();
-
-            // add to error list
-            m_TaskErrorQueue.Enqueue(taskElem);
-
-            // check is need crash
-            m_bIsCrash = true;
-            CallbackWithError();
-        }
+        while (false);
+        
 
         // check next
         CheckNext(taskElem);
@@ -169,7 +176,7 @@ public class PackageResourceUnpackerTool : MonoBehaviour
         if(currentDoneElement.GetError() == null)
         {
             // update process
-            m_fCurrentProcess = m_TaskSucceedQueue.Count / m_iTotalLoadCount;
+            m_fCurrentProcess = (float)m_TaskSucceedQueue.Count / (float)m_iTotalLoadCount;
             if (null != m_ProcessCallback)
             {
                 m_ProcessCallback(m_fCurrentProcess, currentDoneElement.GetName());
@@ -215,7 +222,9 @@ public class PackageResourceUnpackerTool : MonoBehaviour
                 // retry
                 while(m_TaskErrorQueue.Count > 0)
                 {
-                    m_TaskQueue.Enqueue(m_TaskErrorQueue.Dequeue());
+                    var elem = m_TaskErrorQueue.Dequeue();
+                    Debug.Log("retry " + elem.GetUrl());
+                    m_TaskQueue.Enqueue(elem);
                 }
                 // start task
                 StartTask();
@@ -251,10 +260,10 @@ public class PackageResourceUnpackerTool : MonoBehaviour
             case RuntimePlatform.Android:
                 return "jar:file://" + Application.dataPath + "!/assets/";
             case RuntimePlatform.IPhonePlayer:
-                return Application.dataPath + "/Raw/";
+                return "file://" + Application.dataPath + "/Raw/";
             case RuntimePlatform.WindowsPlayer:
             case RuntimePlatform.WindowsEditor:
-                return Application.dataPath + "/StreamingAssets/";
+                return "file://" + Application.dataPath + "/StreamingAssets/";
 
         }
         return  Application.dataPath + "/StreamingAssets/";

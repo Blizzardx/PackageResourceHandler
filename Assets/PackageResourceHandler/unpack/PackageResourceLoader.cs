@@ -13,14 +13,16 @@ public class PackageResourceLoader : MonoBehaviour
     }
     private IEnumerator BeginLoad(string url)
     {
-        WWW loader = new WWW(url);
+        Debug.Log(url);
 
-        yield return loader;
+        PackageResourceWWWElement loader = new PackageResourceWWWElement(url);
 
-        if (!string.IsNullOrEmpty(loader.error))
+        yield return loader.GetRequest();
+
+        if (!string.IsNullOrEmpty(loader.GetRequest().error))
         {
-            Exception e = new Exception(loader.error);
-            loader.Dispose();
+            Exception e = new Exception(loader.GetRequest().error);
+            loader.GetRequest().Dispose();
             // done with error
             if (null != m_DoneCallback)
             {
@@ -30,8 +32,8 @@ public class PackageResourceLoader : MonoBehaviour
         }
         if (null != m_DoneCallback)
         {
-            m_DoneCallback(loader.text, null);
-            loader.Dispose();
+            m_DoneCallback(loader.GetRequest().text, null);
+            loader.GetRequest().Dispose();
         }
     }
     private string GetStreamingAssetPath()
@@ -41,10 +43,10 @@ public class PackageResourceLoader : MonoBehaviour
             case RuntimePlatform.Android:
                 return "jar:file://" + Application.dataPath + "!/assets/";
             case RuntimePlatform.IPhonePlayer:
-                return Application.dataPath + "/Raw/";
+                return "file://" + Application.dataPath + "/Raw/";
             case RuntimePlatform.WindowsPlayer:
             case RuntimePlatform.WindowsEditor:
-                return Application.dataPath + "/StreamingAssets/";
+                return "file://" + Application.dataPath + "/StreamingAssets/";
 
         }
         return Application.dataPath + "/StreamingAssets/";

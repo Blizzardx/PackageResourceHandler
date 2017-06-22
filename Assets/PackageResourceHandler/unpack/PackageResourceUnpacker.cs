@@ -22,22 +22,19 @@ public class PackageResourceUnpacker
         m_ProcessCallback = processCallback;
         try
         {
-            // try load config from streaming assets and local
+            // try load config from streaming assets at local
             string localPath = Application.persistentDataPath + "/" + m_strUnpackedResourceConfigInfoName;
 
-            if (!File.Exists(localPath))
+            m_strUnpackedVersion = string.Empty;
+            
+            if (File.Exists(localPath))
             {
-                OnComplate();
-                return;
-            }
-            var fileContent = File.ReadAllText(localPath);
-            if (string.IsNullOrEmpty(fileContent))
-            {
-                OnComplate();
-                return;
-            }
-
-            m_strUnpackedVersion = fileContent;
+                var fileContent = File.ReadAllText(localPath);
+                if (!string.IsNullOrEmpty(fileContent))
+                {
+                    m_strUnpackedVersion = fileContent;
+                }
+            }            
 
             BeginLoadPackedConfigInfo();
         }
@@ -69,9 +66,17 @@ public class PackageResourceUnpacker
             GameObject.Destroy(tmpLoader);
         }
 
-        if (null != e || string.IsNullOrEmpty(content))
+        if (null != e )
+        {
+            Debug.LogException(e);
+
+            OnComplate();
+            return;
+        }
+        if (string.IsNullOrEmpty(content))
         {
             Debug.LogError("cant' load streaming asset info config");
+
             OnComplate();
             return;
         }
@@ -121,6 +126,10 @@ public class PackageResourceUnpacker
     private void OnProcessCallback(float process, string currentFile)
     {
         Debug.LogFormat("Process : {0} file : {1}", process, currentFile);
+        if(null != m_ProcessCallback)
+        {
+            m_ProcessCallback(process, currentFile);
+        }
     }
     private void OnErrorCallback(List<PackageResourceLoadErrorInfo> obj)
     {
