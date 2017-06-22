@@ -1,12 +1,15 @@
-﻿public class PackageResourceCompress_QuickLZ : IPackageResourceCompressor
+﻿namespace PackageResourceHandler
 {
-    public byte[] Compress(byte[] source)
+    public class PackageResourceCompress_QuickLZ : IPackageResourceCompressor
     {
-        return QuickLZ.compress(source, 1);
-    }
+        public byte[] Compress(byte[] source)
+        {
+            return QuickLZ.compress(source, 1);
+        }
 
-    public byte[] Decompress(byte[] source)
-    {
-        return QuickLZ.decompress(source);
+        public byte[] Decompress(byte[] source)
+        {
+            return QuickLZ.decompress(source);
+        }
     }
 }

@@ -1,51 +1,50 @@
-﻿
-using System;
-using System.Collections.Generic;
-
-public class PackageResourceAssetInfo
+﻿namespace PackageResourceHandler
 {
-    private string m_strSourcePath;
-    private string m_strOutputPath;
-    private string m_strSubPath;
-
-    public PackageResourceAssetInfo(string sourcePath,string sourceDirectory,string targetDirectory)
+    public class PackageResourceAssetInfo
     {
-        sourcePath = FixPath(sourcePath);
-        sourceDirectory = FixPath(sourceDirectory);
-        targetDirectory = FixPath(targetDirectory);
+        private string m_strSourcePath;
+        private string m_strOutputPath;
+        private string m_strSubPath;
 
-        m_strSourcePath = sourcePath;
-        m_strSubPath = sourcePath.Substring(sourceDirectory.Length);
-
-        m_strOutputPath = targetDirectory + m_strSubPath;
-
-    }
-    public bool IsInSuffixIngoreList(string[] ignoreList)
-    {
-        for(int i=0;i<ignoreList.Length;++i)
+        public PackageResourceAssetInfo(string sourcePath, string sourceDirectory, string targetDirectory)
         {
-            if(m_strSourcePath.EndsWith(ignoreList[i]))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-    public string GetOutputPath()
-    {
-        return m_strOutputPath;
-    }
-    public string GetSourcePath()
-    {
-        return m_strSourcePath;
-    }
+            sourcePath = FixPath(sourcePath);
+            sourceDirectory = FixPath(sourceDirectory);
+            targetDirectory = FixPath(targetDirectory);
 
-    public string GetSubpath()
-    {
-        return m_strSubPath;
-    }
-    private string FixPath(string path)
-    {
-        return path.Replace('\\', '/');
+            m_strSourcePath = sourcePath;
+            m_strSubPath = sourcePath.Substring(sourceDirectory.Length);
+
+            m_strOutputPath = targetDirectory + m_strSubPath;
+
+        }
+        public bool IsInSuffixIngoreList(string[] ignoreList)
+        {
+            for (int i = 0; i < ignoreList.Length; ++i)
+            {
+                if (m_strSourcePath.EndsWith(ignoreList[i]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public string GetOutputPath()
+        {
+            return m_strOutputPath;
+        }
+        public string GetSourcePath()
+        {
+            return m_strSourcePath;
+        }
+
+        public string GetSubpath()
+        {
+            return m_strSubPath;
+        }
+        private string FixPath(string path)
+        {
+            return path.Replace('\\', '/');
+        }
     }
 }

@@ -1,6 +1,9 @@
-﻿public interface IPackageResourceCompressor
+﻿namespace PackageResourceHandler
 {
-    byte[] Compress(byte[] source);
+    public interface IPackageResourceCompressor
+    {
+        byte[] Compress(byte[] source);
 
-    byte[] Decompress(byte[] source);
+        byte[] Decompress(byte[] source);
+    }
 }

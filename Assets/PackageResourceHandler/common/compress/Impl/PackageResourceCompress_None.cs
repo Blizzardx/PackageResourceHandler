@@ -1,12 +1,15 @@
-﻿public class PackageResourceCompress_None : IPackageResourceCompressor
+﻿namespace PackageResourceHandler
 {
-    public byte[] Compress(byte[] source)
+    public class PackageResourceCompress_None : IPackageResourceCompressor
     {
-        return source;
-    }
+        public byte[] Compress(byte[] source)
+        {
+            return source;
+        }
 
-    public byte[] Decompress(byte[] source)
-    {
-        return source;
+        public byte[] Decompress(byte[] source)
+        {
+            return source;
+        }
     }
 }

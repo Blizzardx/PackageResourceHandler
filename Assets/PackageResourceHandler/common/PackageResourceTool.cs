@@ -1,13 +1,15 @@
 ﻿using System.IO;
-
-public class PackageResourceTool
+namespace PackageResourceHandler
 {
-    public static void EnsureFolder(string path)
+    public class PackageResourceTool
     {
-        string folder = Path.GetDirectoryName(path);
-        if (!Directory.Exists(folder))
+        public static void EnsureFolder(string path)
         {
-            Directory.CreateDirectory(folder);
+            string folder = Path.GetDirectoryName(path);
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
         }
     }
 }

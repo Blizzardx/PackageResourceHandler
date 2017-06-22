@@ -1,14 +1,16 @@
 ﻿using System;
-
-public class PackageResourceCompress_GZip : IPackageResourceCompressor
+namespace PackageResourceHandler
 {
-    public byte[] Compress(byte[] source)
+    public class PackageResourceCompress_GZip : IPackageResourceCompressor
     {
-        throw new NotImplementedException();
-    }
+        public byte[] Compress(byte[] source)
+        {
+            throw new NotImplementedException();
+        }
 
-    public byte[] Decompress(byte[] source)
-    {
-        throw new NotImplementedException();
+        public byte[] Decompress(byte[] source)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
