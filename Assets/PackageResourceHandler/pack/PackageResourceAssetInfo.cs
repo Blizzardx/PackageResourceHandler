@@ -6,9 +6,18 @@ public class PackageResourceAssetInfo
 {
     private string m_strSourcePath;
     private string m_strOutputPath;
+    private string m_strSubPath;
 
-    public PackageResourceAssetInfo(string fullPath,string sourcePath,string outputPath)
+    public PackageResourceAssetInfo(string sourcePath,string sourceDirectory,string targetDirectory)
     {
+        sourcePath = FixPath(sourcePath);
+        sourceDirectory = FixPath(sourceDirectory);
+        targetDirectory = FixPath(targetDirectory);
+
+        m_strSourcePath = sourcePath;
+        m_strSubPath = sourcePath.Substring(sourceDirectory.Length);
+
+        m_strOutputPath = targetDirectory + m_strSubPath;
 
     }
     public bool IsInSuffixIngoreList(string[] ignoreList)
@@ -22,12 +31,21 @@ public class PackageResourceAssetInfo
         }
         return false;
     }
-    internal string GetOutputPath()
+    public string GetOutputPath()
     {
         return m_strOutputPath;
     }
-    internal string GetSourcePath()
+    public string GetSourcePath()
     {
         return m_strSourcePath;
+    }
+
+    public string GetSubpath()
+    {
+        return m_strSubPath;
+    }
+    private string FixPath(string path)
+    {
+        return path.Replace('\\', '/');
     }
 }
