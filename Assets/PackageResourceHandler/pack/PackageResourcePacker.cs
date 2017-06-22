@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Common.Config;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -10,8 +12,26 @@ public class PackageResourcePacker
         ".git",
         ".meta",
     };
-	public void PackPackageResource(PackageResourceCompressType compressType,string sourceDirectory,string targetDirectory)
+    private const string m_strPackageResourceConfigName = "PackageResourceConfig";
+    private PackageResourceConfig m_ReportConfig;
+
+    public void PackPackageResource(PackageResourceCompressType compressType, string sourceDirectory, string targetDirectory)
     {
+        try
+        {
+            BeginPackPackageResource(compressType,sourceDirectory,targetDirectory);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+    }
+    private void BeginPackPackageResource(PackageResourceCompressType compressType,string sourceDirectory,string targetDirectory)
+    {
+        m_ReportConfig = new PackageResourceConfig();
+
+        m_ReportConfig.compressType = (int)compressType;
+
         // get compressor 
         var compressor = PackageResourceCompressHelper.GetCompress(compressType);
         if(null == compressor)
@@ -21,7 +41,7 @@ public class PackageResourcePacker
         }
 
         // create file list
-        var fileList = GetFileList(sourceDirectory);
+        var fileList = GetFileList(sourceDirectory,targetDirectory);
 
         for(int i=0;i<fileList.Count;++i)
         {
@@ -45,14 +65,34 @@ public class PackageResourcePacker
             // update  report
 
         }
+
+        // save report file
+        var reportFile = XmlConfigBase.Serialize(m_ReportConfig);
+        File.WriteAllText(targetDirectory + m_strPackageResourceConfigName, reportFile);
     }
-    List<PackageResourceAssetInfo> GetFileList(string path)
+    private List<PackageResourceAssetInfo> GetFileList(string sourcePath,string outputPath)
     {
-        return null;
+        var dir = new DirectoryInfo(sourcePath);
+        var files = dir.GetFiles("*", SearchOption.AllDirectories);
+
+        List<PackageResourceAssetInfo> fileList = new List<PackageResourceAssetInfo>();
+
+        for(int i=0;i<files.Length;++i)
+        {
+            PackageResourceAssetInfo elem = new PackageResourceAssetInfo(files[i].FullName, sourcePath, outputPath);
+
+            if(elem.IsInSuffixIngoreList(m_IgnoreSuffixList))
+            {
+                continue;
+            }
+
+            fileList.Add(elem);
+        }
+
+        return fileList;
     }
-    byte[] CompressFile(byte[] source, IPackageResourceCompressor compressType)
+    private byte[] CompressFile(byte[] source, IPackageResourceCompressor compressType)
     {
         return compressType.Compress(source);
     }
-
 }
