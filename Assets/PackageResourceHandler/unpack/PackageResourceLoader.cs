@@ -18,11 +18,11 @@ namespace PackageResourceHandler
 
             PackageResourceWWWElement loader = new PackageResourceWWWElement(url);
 
-            yield return loader.GetRequest();
+            yield return loader;
 
-            if (!string.IsNullOrEmpty(loader.GetRequest().error))
+            if (!string.IsNullOrEmpty(loader.GetError()))
             {
-                Exception e = new Exception(loader.GetRequest().error);
+                Exception e = new Exception(loader.GetError());
                 loader.GetRequest().Dispose();
                 // done with error
                 if (null != m_DoneCallback)

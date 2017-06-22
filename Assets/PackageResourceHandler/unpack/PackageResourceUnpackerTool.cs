@@ -87,7 +87,7 @@ namespace PackageResourceHandler
             Debug.Log(taskElem.GetUrl());
             PackageResourceWWWElement loader = new PackageResourceWWWElement(taskElem.GetUrl());
 
-            yield return loader.GetRequest();
+            yield return loader;
 
             // update loader count
             --m_iCurrentLoaderCount;
@@ -103,30 +103,30 @@ namespace PackageResourceHandler
             }
             else
             {
-                OnOneTaskDone(taskElem, loader.GetRequest());
+                OnOneTaskDone(taskElem, loader);
             }
         }
-        private void OnOneTaskDone(PackageResourceLoaderElement taskElem, WWW request)
+        private void OnOneTaskDone(PackageResourceLoaderElement taskElem, PackageResourceWWWElement request)
         {
             do
             {
-                if (request.error != null)
+                if (request.GetError() != null)
                 {
-                    taskElem.SetErrorInfo(request.error);
+                    taskElem.SetErrorInfo(request.GetError());
                     // release www
-                    request.Dispose();
+                    request.GetRequest().Dispose();
 
                     // add to error list
                     m_TaskErrorQueue.Enqueue(taskElem);
                     break;
                 }
                 // check www content
-                if (null == request.bytes)
+                if (null == request.GetRequest().bytes)
                 {
                     taskElem.SetErrorInfo("load error");
 
                     // release www
-                    request.Dispose();
+                    request.GetRequest().Dispose();
 
                     // add to error list
                     m_TaskErrorQueue.Enqueue(taskElem);
@@ -134,7 +134,7 @@ namespace PackageResourceHandler
                 }
                 try
                 {
-                    byte[] content = request.bytes;
+                    byte[] content = request.GetRequest().bytes;
                     if (null != m_Decompressor)
                     {
                         // decompress
@@ -155,7 +155,7 @@ namespace PackageResourceHandler
                     taskElem.SetErrorInfo(e.Message);
 
                     // release www
-                    request.Dispose();
+                    request.GetRequest().Dispose();
 
                     // add to error list
                     m_TaskErrorQueue.Enqueue(taskElem);
@@ -167,7 +167,6 @@ namespace PackageResourceHandler
                 }
             }
             while (false);
-
 
             // check next
             CheckNext(taskElem);
