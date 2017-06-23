@@ -15,7 +15,7 @@ namespace PackageResourceHandler
         {
             m_strUrl = url;
             m_Loader = new WWW(url);
-            m_fStartTime = Time.realtimeSinceStartup;
+            m_fStartTime = Time.time;
             m_fTimeOut = timeOut;
         }
         public WWW GetRequest()
@@ -24,7 +24,7 @@ namespace PackageResourceHandler
         }
         public bool IsTimeOut()
         {
-            return Time.realtimeSinceStartup - m_fStartTime > m_fTimeOut;
+            return Time.time - m_fStartTime > m_fTimeOut;
         }
         public string GetError()
         {
