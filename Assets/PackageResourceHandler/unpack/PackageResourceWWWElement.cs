@@ -11,7 +11,7 @@ namespace PackageResourceHandler
         private string m_strError;
         private string m_strUrl;
 
-        public PackageResourceWWWElement(string url, float timeOut = 3.0f)
+        public PackageResourceWWWElement(string url, float timeOut = 10.0f)
         {
             m_strUrl = url;
             m_Loader = new WWW(url);
