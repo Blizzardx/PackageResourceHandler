@@ -173,7 +173,7 @@ namespace PackageResourceHandler
         }
         private void CheckNext(PackageResourceLoaderElement currentDoneElement)
         {
-            if (currentDoneElement.GetError() == null)
+            if (!currentDoneElement.HavError())
             {
                 // update process
                 m_fCurrentProcess = (float)m_TaskSucceedQueue.Count / (float)m_iTotalLoadCount;
@@ -223,6 +223,9 @@ namespace PackageResourceHandler
                     while (m_TaskErrorQueue.Count > 0)
                     {
                         var elem = m_TaskErrorQueue.Dequeue();
+                        // clear error
+                        elem.ClearError();
+
                         Debug.Log("retry " + elem.GetUrl());
                         m_TaskQueue.Enqueue(elem);
                     }

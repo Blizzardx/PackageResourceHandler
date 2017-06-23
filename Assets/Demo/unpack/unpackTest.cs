@@ -24,7 +24,7 @@ namespace PackageResourceHandler
         private void OnDoneCallback()
         {
             Debug.Log("Done");
-            log = "Done";
+            log = "Done ";
         }
 
         private void OnCrashCallback(Exception e)

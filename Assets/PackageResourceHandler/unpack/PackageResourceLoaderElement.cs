@@ -42,5 +42,13 @@ namespace PackageResourceHandler
         {
             return m_strErrorInfo;
         }
+        internal bool HavError()
+        {
+            return !string.IsNullOrEmpty(m_strErrorInfo);
+        }
+        internal void ClearError()
+        {
+            m_strErrorInfo = null;
+        }
     }
 }
