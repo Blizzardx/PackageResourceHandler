@@ -33,3 +33,5 @@ build/
 Assets/StreamingAssets/build_info.txt
 Assets/StreamingAssets/build_info.txt.meta
 Assets/StreamingAssets/
+Assets/StreamingAssets.meta
+Source/

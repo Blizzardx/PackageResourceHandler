@@ -9,8 +9,8 @@ namespace PackageResourceHandler
         [MenuItem("PackageResourceHelper/Pack")]
         static void test()
         {
-            string sourceDirectory = "C:\\Users\\Administrator\\AppData\\LocalLow\\pwrd\\gamecqq\\";
-            string targetDirectory = "E:\\Project\\unityProjcet\\PackageResourceHandler\\Assets\\StreamingAssets\\";
+            string sourceDirectory = "E:\\Project\\PackageResourceHandler\\Source\\";
+            string targetDirectory = "E:\\Project\\PackageResourceHandler\\Assets\\StreamingAssets\\";
             PackageResourcePacker tool = new PackageResourcePacker();
             tool.PackPackageResource(PackageResourceCompressType.None, sourceDirectory, targetDirectory);
 
